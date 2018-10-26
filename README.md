@@ -1,4 +1,4 @@
-# the-compiler
+# SmileFuck
 
 We develop a compiler for a toy programming language by using Haskell.
 
