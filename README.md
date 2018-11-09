@@ -19,3 +19,8 @@ The articles:
 8. [Оптимизация](https://habr.com/post/101946/)
 9. [Исполняемый код](https://habr.com/post/103402/)
 10. [Компиляция в ELF](https://habr.com/post/104104/)
+
+Some examples of Haskell-writed compilers and interpreters:
+
+1. [Write Yourself a Scheme in 48 Hours](https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours)
+2. [Пишем простой интерпретатор на Haskell](https://eax.me/simple-interpreter/)
