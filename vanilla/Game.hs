@@ -19,6 +19,11 @@ module Game where
   getAliveNeighbours :: Universe -> Cell -> [Cell]
   getAliveNeighbours u c = (filter isAlive) (getNeighbours u c)
 
+  getSimulatedData :: Int -> Int -> [[Bool]]
+  getSimulatedData h w = map (map isAlive) (u h w)
+    where
+      u h w = simulateUniverse 100 $ populateUniverseWithGlider $ createUniverse h w
+
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
     where
