@@ -6,12 +6,35 @@ module Game where
   import Data.Tuple (swap)
   import Control.Monad (replicateM_)
   import Universe
-  import Cell (isAlive, isNeighbourOf)
+  import Cell (isAlive)
   import Helpers (printArray)
   import RandomStuff
 
   getNeighbours :: Universe -> Cell -> [Cell]
   getNeighbours u c = (filter $ isNeighbourOf c) u
+    where
+      isNeighbourOf :: Cell -> Cell -> Bool
+      cell1 `isNeighbourOf` cell2 = (x1 /= x2 || y1 /= y2) && (x1 `closeAtX` x2) && (y1 `closeAtY` y2)
+        where
+          y1 = fst (fst cell1)
+          x1 = snd (fst cell1)
+
+          y2 = fst (fst cell2)
+          x2 = snd (fst cell2)
+
+          closeAt :: Int -> Int -> Int -> Bool
+          closeAt c a b = (abs (a - b) < 2) || (abs (a - b) >= c)
+
+          closeAtX :: Int -> Int -> Bool
+          closeAtX = closeAt widthOfUniverse
+
+          closeAtY :: Int -> Int -> Bool
+          closeAtY = closeAt heightOfUniverse
+
+          lc = last u
+
+          widthOfUniverse = snd (fst lc)
+          heightOfUniverse = fst (fst lc)
 
   getAliveCells :: Universe -> [Cell]
   getAliveCells u = (filter isAlive) u
@@ -48,5 +71,5 @@ module Game where
   transformUniverse u = actualizeUniverse $ predictFuture u
 
 
-  run = printMultiverse $ simulateUniverse 100 $ populateUniverseWithGlider $ createUniverse 5 10
+  run = printMultiverse $ simulateUniverse 200 $ populateUniverseWithGlider $ createUniverse 10 10
   runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),(True, False))

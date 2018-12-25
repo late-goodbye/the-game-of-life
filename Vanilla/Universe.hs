@@ -12,8 +12,8 @@ module Universe where
       actualize (node, state) = (node, (snd state, False))
 
   createUniverse :: Int -> Int -> Universe
-  createUniverse height width = [((y, x), (False, False)) | x <- [0..height],
-                                                            y <- [0..width] ]
+  createUniverse height width = [((y, x), (False, False)) | x <- [0..(height-1)],
+                                                            y <- [0..(width-1)] ]
 
   formatUniverse :: Universe -> String
   formatUniverse u = do
@@ -23,9 +23,9 @@ module Universe where
     where
       mark cell
         | isAlive cell = '*'
-        | otherwise = 'o'
+        | otherwise = '.'
       eol cell
-        | fst (fst cell) == 10 = ['\n']
+        | fst (fst cell) == 9 = ['\n']
         | otherwise = []
 
   -- Not implemented properly yet
