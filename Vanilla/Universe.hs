@@ -25,8 +25,9 @@ module Universe where
         | isAlive cell = '*'
         | otherwise = '.'
       eol cell
-        | fst (fst cell) == 9 = ['\n']
+        | (fst . fst $ cell) == (fst . fst $ lc) = ['\n']
         | otherwise = []
+      lc = last u
 
   -- Not implemented properly yet
   populateUniverse :: Universe -> Universe
