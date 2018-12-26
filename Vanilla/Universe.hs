@@ -3,7 +3,6 @@ module Universe where
   import Types
   import System.Console.ANSI (clearScreen)
   import Control.Concurrent (threadDelay)
-  import System.Posix.Unistd (sleep)
   import Cell
 
   actualizeUniverse :: Universe -> Universe
@@ -54,7 +53,7 @@ module Universe where
 
   printUniverse :: Universe -> IO ()
   printUniverse u = do
-    sleep 1
+    threadDelay 1000000
     clearScreen
     putStrLn $ formatUniverse u
 
