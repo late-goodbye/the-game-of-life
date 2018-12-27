@@ -1,9 +1,8 @@
 module Universe where
 
   import Types
-  import System.Console.ANSI (clearScreen)
-  import Control.Concurrent (threadDelay)
   import Cell
+  import Helpers
 
   actualizeUniverse :: Universe -> Universe
   actualizeUniverse u = (map actualize) u
@@ -17,7 +16,6 @@ module Universe where
   formatUniverse :: Universe -> String
   formatUniverse u = do
     cell <- u
-
     [mark cell] ++ eol cell
     where
       mark cell
@@ -32,33 +30,27 @@ module Universe where
   populateUniverse :: Universe -> Universe
   populateUniverse u = (map revive) u
     where
-      revive cell
+      revive cell@((x,y),_)
           -- x has to be equal to a random value here, not zero
         | x == 0 = ((y, x), (True, False))
         | otherwise = cell
-        where
-          x = fst (fst cell)
-          y = snd (fst cell)
 
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
     where
-      revive cell
+      revive cell@((x,y),_)
         | (x, y) `elem` glider = ((x, y), (True, False))
         | otherwise = cell
         where
-          x = fst (fst cell)
-          y = snd (fst cell)
           glider = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
 
   printUniverse :: Universe -> IO ()
   printUniverse u = do
-    threadDelay 1000000
-    clearScreen
+    resetScreen
     putStrLn $ formatUniverse u
+    pause 500
 
   printMultiverse :: Multiverse -> IO ()
-  printMultiverse [] = putStrLn "Fin."
-  printMultiverse (u : us) = do
-    printUniverse u
-    printMultiverse us
+  printMultiverse us = do
+    mapM_ printUniverse us
+    putStrLn "Fin."
