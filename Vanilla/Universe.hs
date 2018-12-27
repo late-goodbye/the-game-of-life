@@ -3,7 +3,8 @@ module Universe where
   import Types
   import System.Console.ANSI (clearScreen)
   import Control.Concurrent (threadDelay)
-  import Cell
+  import Cell (isAlive)
+  import RandomStuff (getRandomCellState)
 
   actualizeUniverse :: Universe -> Universe
   actualizeUniverse u = (map actualize) u
@@ -29,16 +30,15 @@ module Universe where
       lc = last u
 
   -- Not implemented properly yet
-  populateUniverse :: Universe -> Universe
-  populateUniverse u = (map revive) u
+  populateUniverse :: Int -> Universe -> Universe
+  populateUniverse density u = (map $ revive density) u
     where
-      revive cell
-          -- x has to be equal to a random value here, not zero
-        | x == 0 = ((y, x), (True, False))
+      revive density cell
+        | (x + y * x + getRandomCellState) `mod` 10 < density = ((y, x), (True, False))
         | otherwise = cell
         where
-          x = fst (fst cell)
-          y = snd (fst cell)
+          y = fst . fst $ cell
+          x = snd . fst $ cell
 
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
@@ -47,8 +47,8 @@ module Universe where
         | (x, y) `elem` glider = ((x, y), (True, False))
         | otherwise = cell
         where
-          x = fst (fst cell)
-          y = snd (fst cell)
+          x = fst . fst $ cell
+          y = snd . fst $ cell
           glider = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
 
   printUniverse :: Universe -> IO ()

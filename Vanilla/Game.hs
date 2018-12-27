@@ -73,3 +73,4 @@ module Game where
 
   run h w steps = printMultiverse $ simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
   runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),(True, False))
+  runRandom h w steps density = printMultiverse $ simulateUniverse steps $ (populateUniverse density) $ createUniverse h w
