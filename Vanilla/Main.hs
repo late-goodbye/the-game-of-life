@@ -14,3 +14,4 @@ module Main where
     w <- prompt "Map width: "
     steps <- prompt "How many steps to simulate: "
     runRandom h w steps 0.3
+    putStrLn "Fin."

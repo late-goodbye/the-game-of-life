@@ -2,7 +2,6 @@ module Universe where
 
   import Types
   import System.Console.ANSI (clearScreen)
-  import Control.Concurrent (threadDelay)
   import Cell (isAlive)
   import RandomStuff
   import Helpers
@@ -25,7 +24,7 @@ module Universe where
       lc = last u
 
   randomCell :: Double -> Node -> IO Cell
-  randomCell prob c = (randomBool prob) >>= (\b -> return (c,b))
+  randomCell prob c = (randomBool prob) >>= (return . ((,) c))
 
   generateUniverse :: Int -> Int -> Double -> IO Universe
   generateUniverse h w density =
@@ -49,6 +48,4 @@ module Universe where
     pause 500
 
   printMultiverse :: Multiverse -> IO ()
-  printMultiverse us = do
-    mapM_ printUniverse us
-    putStrLn "Fin."
+  printMultiverse us = mapM_ printUniverse us

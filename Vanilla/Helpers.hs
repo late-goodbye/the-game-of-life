@@ -2,15 +2,11 @@ module Helpers where
 
   import System.Console.ANSI
   import System.IO
+  import Data.List.Split (chunksOf)
 
   import Control.Concurrent
 
-  splitEvery _ [] = []
-  splitEvery n list = first : (splitEvery n rest)
-    where
-      (first,rest) = splitAt n list
-
-  printArray arr = mapM_ (putStrLn . unwords) $ map (map show) $ splitEvery 5 arr
+  printArray arr = mapM_ (putStrLn . unwords) $ map (map show) $ chunksOf 5 arr
 
   resetScreen :: IO ()
   resetScreen = clearScreen >> setSGR [Reset] >> setCursorPosition 0 0

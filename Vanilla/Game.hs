@@ -1,10 +1,6 @@
 module Game where
 
   import Types
-  import Text.Printf
-  import Data.List (transpose)
-  import Data.Tuple (swap)
-  import Control.Monad (replicateM_)
   import Universe
   import Cell (isAlive)
   import Helpers (printArray)
@@ -25,21 +21,10 @@ module Game where
           closeAtY :: Int -> Int -> Bool
           closeAtY = closeAt heightOfUniverse
 
-          lc = last u
-
-          widthOfUniverse = snd (fst lc)
-          heightOfUniverse = fst (fst lc)
-
-  getAliveCells :: Universe -> [Cell]
-  getAliveCells u = (filter isAlive) u
+          ((widthOfUniverse, heightOfUniverse),_) = last u
 
   getAliveNeighbours :: Universe -> Cell -> [Cell]
   getAliveNeighbours u c = (filter isAlive) (getNeighbours u c)
-
-  getSimulatedGlider :: Int -> Int -> Int -> [[Bool]]
-  getSimulatedGlider h w steps = map (map isAlive) (u h w)
-    where
-      u h w = simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
 
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
@@ -52,10 +37,9 @@ module Game where
           neighbours = getAliveNeighbours u cell
           nc = length neighbours
 
-  simulateUniverse :: Int -> Universe -> Multiverse
-  simulateUniverse 0 universe = [universe]
-  simulateUniverse epoch universe = universe : simulateUniverse (epoch - 1) (predictFuture universe)
+  simulateUniverse :: Universe -> Multiverse
+  simulateUniverse universe = universe : simulateUniverse (predictFuture universe)
 
-  run h w steps = printMultiverse $ simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
+  run h w steps = printMultiverse $ (take steps) $ simulateUniverse $ populateUniverseWithGlider $ createUniverse h w
   runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),True)
-  runRandom h w steps density = generateUniverse h w density >>= (printMultiverse . (simulateUniverse steps))
+  runRandom h w steps density = generateUniverse h w density >>= (printMultiverse . (take steps) . simulateUniverse)
