@@ -4,7 +4,7 @@ module Universe where
   import System.Console.ANSI (clearScreen)
   import Control.Concurrent (threadDelay)
   import Cell (isAlive)
-  import RandomStuff (getRandomCellState)
+  import RandomStuff
   import Helpers
 
   createUniverse :: Int -> Int -> Universe
@@ -24,16 +24,12 @@ module Universe where
         | otherwise = []
       lc = last u
 
-  -- Not implemented properly yet
-  populateUniverse :: Int -> Universe -> Universe
-  populateUniverse density u = (map $ revive density) u
-    where
-      revive density cell
-        | (x + y * x + getRandomCellState) `mod` 10 < density = ((y, x), True)
-        | otherwise = cell
-        where
-          y = fst . fst $ cell
-          x = snd . fst $ cell
+  randomCell :: Double -> Node -> IO Cell
+  randomCell prob c = (randomBool prob) >>= (\b -> return (c,b))
+
+  generateUniverse :: Int -> Int -> Double -> IO Universe
+  generateUniverse h w density =
+    mapM (randomCell density) [(y, x)| x <- [0..(h-1)], y <- [0..(w-1)] ]
 
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u

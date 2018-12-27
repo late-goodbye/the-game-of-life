@@ -11,6 +11,6 @@ module Main where
 
   main = do
     h <- prompt "Map height: "
-    w <- prompt "Max width: "
+    w <- prompt "Map width: "
     steps <- prompt "How many steps to simulate: "
-    runRandom h w steps 3
+    runRandom h w steps 0.3

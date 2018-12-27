@@ -41,18 +41,13 @@ module Game where
     where
       u h w = simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
 
-  getSimulatedRandom :: Int -> Int -> Int -> Int -> [[Bool]]
-  getSimulatedRandom h w steps density = map (map isAlive) (u h w)
-    where
-      u h w = simulateUniverse steps $ (populateUniverse density) $ createUniverse h w
-
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
     where
       predict cell@((x,y),alive)
-        | alive && (nc > 3 || nc < 2) = ((x, y), False)
-        | (not alive) && (nc == 3) = ((x, y), True)
-        | otherwise = ((x, y), alive)
+        | nc == 2 = ((x, y), alive)
+        | nc == 3 = ((x, y), True)
+        | otherwise = ((x, y), False)
         where
           neighbours = getAliveNeighbours u cell
           nc = length neighbours
@@ -63,4 +58,4 @@ module Game where
 
   run h w steps = printMultiverse $ simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
   runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),True)
-  runRandom h w steps density = printMultiverse $ simulateUniverse steps $ (populateUniverse density) $ createUniverse h w
+  runRandom h w steps density = generateUniverse h w density >>= (printMultiverse . (simulateUniverse steps))
