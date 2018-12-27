@@ -4,14 +4,9 @@ module Universe where
   import Cell
   import Helpers
 
-  actualizeUniverse :: Universe -> Universe
-  actualizeUniverse u = (map actualize) u
-    where
-      actualize (node, state) = (node, (snd state, False))
-
   createUniverse :: Int -> Int -> Universe
-  createUniverse height width = [((y, x), (False, False)) | x <- [0..(height-1)],
-                                                            y <- [0..(width-1)] ]
+  createUniverse height width = [((y, x), False) | x <- [0..(height-1)],
+                                                   y <- [0..(width-1)] ]
 
   formatUniverse :: Universe -> String
   formatUniverse u = do
@@ -32,14 +27,14 @@ module Universe where
     where
       revive cell@((x,y),_)
           -- x has to be equal to a random value here, not zero
-        | x == 0 = ((y, x), (True, False))
+        | x == 0 = ((y, x), True)
         | otherwise = cell
 
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
     where
       revive cell@((x,y),_)
-        | (x, y) `elem` glider = ((x, y), (True, False))
+        | (x, y) `elem` glider = ((x, y), True)
         | otherwise = cell
         where
           glider = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]

@@ -44,20 +44,17 @@ module Game where
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
     where
-      predict cell@((x,y),(present,future))
-        | present && ((length neighbours) > 3 || (length neighbours) < 2) = ((x, y), (present, False))
-        | (not present) && ((length neighbours) == 3) = ((x, y), (present, True))
-        | otherwise = ((x, y), (present, present))
+      predict cell@((x,y),alive)
+        | alive && (nc > 3 || nc < 2) = ((x, y), False)
+        | (not alive) && (nc == 3) = ((x, y), True)
+        | otherwise = ((x, y), alive)
         where
           neighbours = getAliveNeighbours u cell
+          nc = length neighbours
 
   simulateUniverse :: Int -> Universe -> Multiverse
   simulateUniverse 0 universe = [universe]
-  simulateUniverse epoch universe = universe : simulateUniverse (epoch - 1) (transformUniverse universe)
-
-  transformUniverse :: Universe -> Universe
-  transformUniverse u = actualizeUniverse $ predictFuture u
-
+  simulateUniverse epoch universe = universe : simulateUniverse (epoch - 1) (predictFuture universe)
 
   run h w steps = printMultiverse $ simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
-  runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),(True, False))
+  runDebug = printArray $ getNeighbours (populateUniverseWithGlider $ createUniverse 5 10) ((1, 0),True)
