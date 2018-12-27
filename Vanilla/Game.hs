@@ -42,10 +42,15 @@ module Game where
   getAliveNeighbours :: Universe -> Cell -> [Cell]
   getAliveNeighbours u c = (filter isAlive) (getNeighbours u c)
 
-  getSimulatedData :: Int -> Int -> Int -> [[Bool]]
+  getSimulatedGlider :: Int -> Int -> Int -> [[Bool]]
   getSimulatedData h w steps = map (map isAlive) (u h w)
     where
       u h w = simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
+
+  getSimulatedRandom :: Int -> Int -> Int -> Int -> [[Bool]]
+  getSimulatedRandom h w steps density = map (map isAlive) (u h w)
+    where
+      u h w = simulateUniverse steps $ (populateUniverse density) $ createUniverse h w
 
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
