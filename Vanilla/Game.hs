@@ -43,7 +43,7 @@ module Game where
   getAliveNeighbours u c = (filter isAlive) (getNeighbours u c)
 
   getSimulatedGlider :: Int -> Int -> Int -> [[Bool]]
-  getSimulatedData h w steps = map (map isAlive) (u h w)
+  getSimulatedGlider h w steps = map (map isAlive) (u h w)
     where
       u h w = simulateUniverse steps $ populateUniverseWithGlider $ createUniverse h w
 
