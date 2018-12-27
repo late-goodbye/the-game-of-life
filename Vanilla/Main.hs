@@ -1,6 +1,6 @@
 module Main where
 
-  import Game (run, runDebug)
+  import Game (run, runDebug, runRandom)
   import System.IO
 
   prompt s = do
@@ -13,4 +13,4 @@ module Main where
     h <- prompt "Map height: "
     w <- prompt "Max width: "
     steps <- prompt "How many steps to simulate: "
-    run h w steps
+    runRandom h w steps 3

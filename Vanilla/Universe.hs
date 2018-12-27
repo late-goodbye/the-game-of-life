@@ -1,7 +1,10 @@
 module Universe where
 
   import Types
-  import Cell
+  import System.Console.ANSI (clearScreen)
+  import Control.Concurrent (threadDelay)
+  import Cell (isAlive)
+  import RandomStuff (getRandomCellState)
   import Helpers
 
   createUniverse :: Int -> Int -> Universe
@@ -22,13 +25,15 @@ module Universe where
       lc = last u
 
   -- Not implemented properly yet
-  populateUniverse :: Universe -> Universe
-  populateUniverse u = (map revive) u
+  populateUniverse :: Int -> Universe -> Universe
+  populateUniverse density u = (map $ revive density) u
     where
-      revive cell@((x,y),_)
-          -- x has to be equal to a random value here, not zero
-        | x == 0 = ((y, x), True)
+      revive density cell
+        | (x + y * x + getRandomCellState) `mod` 10 < density = ((y, x), True)
         | otherwise = cell
+        where
+          y = fst . fst $ cell
+          x = snd . fst $ cell
 
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
@@ -37,6 +42,8 @@ module Universe where
         | (x, y) `elem` glider = ((x, y), True)
         | otherwise = cell
         where
+          x = fst . fst $ cell
+          y = snd . fst $ cell
           glider = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
 
   printUniverse :: Universe -> IO ()

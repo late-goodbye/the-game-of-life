@@ -1,14 +1,11 @@
 module RandomStuff where
-  import Data.Time.Clock.POSIX (getPOSIXTime)
-  -- I have no idea how the next three functions have to work
-  nanoTime :: IO Integer
-  t mul = round . (mul *) <$> getPOSIXTime
-  nanoTime = t 1000000000
+  import System.Random
+  import System.IO
+  import System.IO.Unsafe
 
-  getRandomNumber :: IO Integer
-  getRandomNumber = do
-    num <- nanoTime
-    return num
+  getRand :: Bool -> Int
+  getRand i = unsafePerformIO randomIO
 
-  checkRandomNumber :: Int -> Bool
-  checkRandomNumber num = (num `mod` 10) > 6
+  getRandomCellState :: Int
+
+  getRandomCellState = mod (getRand True) 1000000
