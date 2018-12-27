@@ -5,6 +5,7 @@ module Universe where
   import Control.Concurrent (threadDelay)
   import Cell (isAlive)
   import RandomStuff (getRandomCellState)
+  import Helpers
 
   actualizeUniverse :: Universe -> Universe
   actualizeUniverse u = (map actualize) u
@@ -18,7 +19,6 @@ module Universe where
   formatUniverse :: Universe -> String
   formatUniverse u = do
     cell <- u
-
     [mark cell] ++ eol cell
     where
       mark cell
@@ -43,7 +43,7 @@ module Universe where
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
     where
-      revive cell
+      revive cell@((x,y),_)
         | (x, y) `elem` glider = ((x, y), (True, False))
         | otherwise = cell
         where
@@ -53,12 +53,11 @@ module Universe where
 
   printUniverse :: Universe -> IO ()
   printUniverse u = do
-    threadDelay 1000000
-    clearScreen
+    resetScreen
     putStrLn $ formatUniverse u
+    pause 500
 
   printMultiverse :: Multiverse -> IO ()
-  printMultiverse [] = putStrLn "Fin."
-  printMultiverse (u : us) = do
-    printUniverse u
-    printMultiverse us
+  printMultiverse us = do
+    mapM_ printUniverse us
+    putStrLn "Fin."

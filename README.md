@@ -22,6 +22,8 @@ stack install ansi-terminal
 
 Not working with `runhaskell` command. I have no idea why.
 
+Either compile with ghc, or use ghci
+
 ```bash
 $ ghci
 Prelude> :l Main.hs

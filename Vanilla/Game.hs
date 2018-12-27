@@ -14,14 +14,8 @@ module Game where
   getNeighbours u c = (filter $ isNeighbourOf c) u
     where
       isNeighbourOf :: Cell -> Cell -> Bool
-      cell1 `isNeighbourOf` cell2 = (x1 /= x2 || y1 /= y2) && (x1 `closeAtX` x2) && (y1 `closeAtY` y2)
+      ((x1,y1),_) `isNeighbourOf` ((x2,y2),_) = (x1 /= x2 || y1 /= y2) && (x1 `closeAtX` x2) && (y1 `closeAtY` y2)
         where
-          y1 = fst . fst $ cell1
-          x1 = snd . fst $ cell1
-
-          y2 = fst . fst $ cell2
-          x2 = snd . fst $ cell2
-
           closeAt :: Int -> Int -> Int -> Bool
           closeAt c a b = (abs (a - b) < 2) || (abs (a - b) >= c)
 
@@ -55,18 +49,12 @@ module Game where
   predictFuture :: Universe -> Universe
   predictFuture u = (map predict) u
     where
-      predict cell
+      predict cell@((x,y),(present,future))
         | present && ((length neighbours) > 3 || (length neighbours) < 2) = ((x, y), (present, False))
         | (not present) && ((length neighbours) == 3) = ((x, y), (present, True))
         | otherwise = ((x, y), (present, present))
         where
           neighbours = getAliveNeighbours u cell
-
-          x = fst . fst $ cell
-          y = snd . fst $ cell
-
-          present = fst . snd $ cell
-          future = snd . snd $ cell
 
   simulateUniverse :: Int -> Universe -> Multiverse
   simulateUniverse 0 universe = [universe]
