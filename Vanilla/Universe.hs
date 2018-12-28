@@ -3,9 +3,10 @@ module Universe where
   import Types
   import System.Console.ANSI (clearScreen)
   import Control.Concurrent (threadDelay)
-  import Cell (isAlive)
+  import Cell 
   import RandomStuff
   import Helpers
+  import Printing (printing)
 
   createUniverse :: Int -> Int -> Universe
   createUniverse height width = [((y, x), False) | x <- [0..(height-1)],
@@ -31,6 +32,7 @@ module Universe where
   generateUniverse h w density =
     mapM (randomCell density) [(y, x)| x <- [0..(h-1)], y <- [0..(w-1)] ]
 
+
   populateUniverseWithGlider :: Universe -> Universe
   populateUniverseWithGlider u = (map revive) u
     where
@@ -43,12 +45,11 @@ module Universe where
           glider = [(0, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
 
   printUniverse :: Universe -> IO ()
-  printUniverse u = do
-    resetScreen
-    putStrLn $ formatUniverse u
-    pause 500
+  printUniverse u = do  
+	printing u 
 
   printMultiverse :: Multiverse -> IO ()
   printMultiverse us = do
     mapM_ printUniverse us
-    putStrLn "Fin."
+    
+    

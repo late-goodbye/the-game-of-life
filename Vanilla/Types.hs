@@ -4,3 +4,8 @@ module Types where
   type Cell = (Node, Bool)
   type Universe = [Cell]
   type Multiverse = [Universe]
+
+  
+ 
+  
+  
