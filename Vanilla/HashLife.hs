@@ -1,17 +1,7 @@
 module HashLife where
 
   import HashLifeUtil
-  import Data.List.Split
-  import Data.Function
-
-  instance (Show Square) where
-    show Dead = "."
-    show Alive = "*"
-    show (Square (nw,ne,sw,se)) = concat $ (concat' nw ne) ++ ["\n"] ++ (concat' sw se)
-      where
-      concat' :: Square -> Square -> [String]
-      concat' = zipWith (++) `on` ((splitOneOf "\n") . show)
-
+  import Data.List
 
   fromMatrix :: [[Bool]] -> Square
   fromMatrix [[True]] = Alive
@@ -25,3 +15,11 @@ module HashLife where
     ne = map snd n
     sw = map fst s
     se = map snd s
+
+  fromStrings ss = fromMatrix $ map (map toBool) ss
+    where toBool c = c == '*'
+
+  oneStep s = do
+    cons <- init_cons
+    calc <- init_calc cons
+    calc s

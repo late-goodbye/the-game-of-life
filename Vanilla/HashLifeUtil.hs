@@ -4,9 +4,26 @@ module HashLifeUtil where
   import           Data.Hashable
   import           System.Mem.StableName
   import           System.Mem.Weak
+  import Data.List
+  import Data.List.Split (splitOneOf)
+  import Data.Function
 
   type Quad a = (a,a,a,a)
   data Square = Square (Quad Square) | Dead | Alive deriving (Eq)
+
+  instance (Hashable Square) where
+    hashWithSalt salt Dead = salt
+    hashWithSalt salt Alive = salt + 1
+    hashWithSalt salt (Square q) = salt + hashWithSalt salt q
+
+  instance (Show Square) where
+    show Dead = "."
+    show Alive = "*"
+    show (Square (nw,ne,sw,se)) = concat $ addBreaks (concat' nw ne) ++ ["\n"] ++ addBreaks (concat' sw se)
+      where
+      concat' :: Square -> Square -> [String]
+      concat' = zipWith (++) `on` ((splitOneOf "\n") . show)
+      addBreaks = intersperse "\n"
 
   infixl 9 #
 
@@ -23,6 +40,16 @@ module HashLifeUtil where
 
   type MemoTable name val = HT.BasicHashTable name (Weak val)
 
+--  newtype QSN a = Quad (StableName a)
+--
+--  instance (Hashable a) => (Hashable (QSN a)) where
+--    hashWithSalt salt (nw,ne,sw,se) = salt + nwh*3 + neh*5 + swh*7 + seh*9
+--      where
+--        nwh = hashWithSalt salt nw
+--        neh = hashWithSalt salt ne
+--        swh = hashWithSalt salt sw
+--        seh = hashWithSalt salt se
+
   makeStableName4 :: Quad a -> IO (Quad (StableName a))
   makeStableName4 (nw,ne,sw,se) = do
       nwn <- makeStableName nw
@@ -30,14 +57,6 @@ module HashLifeUtil where
       swn <- makeStableName sw
       sen <- makeStableName se
       return (nwn,nen,swn,sen)
-
-  hashStableName4 :: Quad (StableName a) -> Int
-  hashStableName4 (nw,ne,sw,se) = nwh*3 + neh*5 + swh*7 + seh*9
-    where
-      nwh = hashStableName nw
-      neh = hashStableName ne
-      swh = hashStableName sw
-      seh = hashStableName se
 
   memoize :: (Eq name, Hashable name) => MemoTable name val -> (key -> IO name) -> (key -> IO val)
           -> key -> IO val
@@ -118,8 +137,9 @@ module HashLifeUtil where
   get_ss cons (nw,ne,sw,se) = cons (sw#NE, se#NW, sw#SE, se#SW)
   get_se cons (nw,ne,sw,se) = return se
 
-  calc' :: SquareCons -> SquareCalc -> Square -> IO Square
-  calc' cons rec (Square q) = do
+  calc' :: SquareCons -> SquareCalc -> Quad Square -> IO Square
+  calc' cons rec q = do
+      putStrLn $ "calc' on " ++ show q
       nw1 <- rec =<< get_nw cons q
       nn1 <- rec =<< get_nn cons q
       ne1 <- rec =<< get_ne cons q
@@ -136,19 +156,22 @@ module HashLifeUtil where
       se2 <- rec =<< cons (cc1, ee1, ss1, se1)
       cons (nw2, ne2, sw2, se2)
 
---  init_cons :: IO SquareCons
---  init_cons = do
---      tbl <- HT.new
---      let add (Square q) = memoins' tbl q q
---      mapM_ add (sq_0 ++ sq_1 ++ sq_2)
---
---      return $ memoize' tbl return
+  init_cons :: IO SquareCons
+  init_cons = do
+      tbl <- HT.new
+      let add (Square q) = memoins' tbl q q
+      mapM_ add (sq_1 ++ sq_2)
 
---  init_calc :: SquareCons -> IO SquareCalc
---  init_calc cons = do
---      tbl <- HT.new
---      let add (Square q) = memoins' tbl q (calc_4x4 cons q)
---      mapM_ add sq_2
---
---      let calc s@(Square q) = memoize' tbl (calc' cons calc) s
---      return calc
+      let cons k = (memoize' tbl return k) >>= (return . Square)
+      return cons
+
+  init_calc :: SquareCons -> IO SquareCalc
+  init_calc cons = do
+      tbl <- HT.new
+      let add (Square q) = do {val <- calc_4x4 cons q; memoins' tbl q val}
+      
+      mapM_ add sq_2
+
+      let calc s | (Square q) <- s = memoize' tbl (calc' cons calc) q
+                 | otherwise = return s
+      return calc
